@@ -41,4 +41,74 @@ test.describe('P4 search', () => {
     await page.locator('#btn-summon-search').click();
     await expect(page.locator('.engine-item[data-engine="baidu"]')).toHaveClass(/active/);
   });
+
+  test('Enter searches the engine instead of auto-opening the first bookmark match', async ({ page }) => {
+    await waitForApp(page);
+    await page.evaluate(() => {
+      window.__openedUrls = [];
+      window.open = (url) => {
+        window.__openedUrls.push(String(url || ''));
+        return null;
+      };
+      window.appData = window.appData || { items: [], categories: [], settings: {} };
+      window.appData.items = [
+        ...(window.appData.items || []),
+        {
+          id: 'gmail-fixture',
+          title: 'Gmail',
+          url: 'https://mail.google.com',
+          desc: '',
+          icon: '',
+          hidden: false,
+        },
+      ];
+    });
+
+    const sea = page.locator('#sea-input');
+    await page.locator('#btn-summon-search').click();
+    await sea.fill('Google.com');
+    await expect(page.locator('.local-result-item')).toContainText('mail.google.com');
+    await expect(page.locator('.local-result-item.active')).toHaveCount(0);
+    await sea.press('Enter');
+
+    const opened = await page.evaluate(() => window.__openedUrls);
+    expect(opened.some((url) => url.includes('mail.google.com'))).toBe(false);
+    expect(opened.some((url) => /[?&](q|wd|query)=/.test(url) && decodeURIComponent(url).includes('Google.com'))).toBe(
+      true
+    );
+  });
+
+  test('ArrowDown then Enter opens the highlighted bookmark', async ({ page }) => {
+    await waitForApp(page);
+    await page.evaluate(() => {
+      window.__openedUrls = [];
+      window.open = (url) => {
+        window.__openedUrls.push(String(url || ''));
+        return null;
+      };
+      window.appData = window.appData || { items: [], categories: [], settings: {} };
+      window.appData.items = [
+        ...(window.appData.items || []),
+        {
+          id: 'gmail-fixture-2',
+          title: 'Gmail',
+          url: 'https://mail.google.com',
+          desc: '',
+          icon: '',
+          hidden: false,
+        },
+      ];
+    });
+
+    const sea = page.locator('#sea-input');
+    await page.locator('#btn-summon-search').click();
+    await sea.fill('Google.com');
+    await expect(page.locator('.local-result-item')).toContainText('mail.google.com');
+    await sea.press('ArrowDown');
+    await expect(page.locator('.local-result-item.active')).toContainText('mail.google.com');
+    await sea.press('Enter');
+
+    const opened = await page.evaluate(() => window.__openedUrls);
+    expect(opened.some((url) => url.includes('https://mail.google.com'))).toBe(true);
+  });
 });

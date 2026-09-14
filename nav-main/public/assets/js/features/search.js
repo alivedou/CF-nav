@@ -144,17 +144,19 @@ const initSearch = () => {
         if (e.key === 'Enter') {
             const val = sea.value.trim();
             if (val) {
+                e.preventDefault();
                 // 搜索历史持久化
                 window.searchHistory = [val, ...window.searchHistory.filter(h => h !== val)].slice(0, 20);
                 localStorage.setItem('search_history', JSON.stringify(window.searchHistory));
                 window.historyIndex = -1;
 
-                // 如果有选中的搜索项，优先跳转
+                // 只有方向键明确选中的快捷卡片才直达；未选中时回车走搜索引擎
                 const activeItem = resultsList.querySelector('.local-result-item.active');
                 if (activeItem) {
                     activeItem.click();
                 } else {
-                    window.open(window.currentEnginePrefix + encodeURIComponent(val), '_blank');
+                    const prefix = window.currentEnginePrefix || 'https://cn.bing.com/search?q=';
+                    window.open(prefix + encodeURIComponent(val), '_blank');
                 }
             }
         }
@@ -180,8 +182,13 @@ const initSearch = () => {
 
             e.preventDefault();
             let activeIdx = items.findIndex(i => i.classList.contains('active'));
-            if (e.key === 'ArrowDown') activeIdx = (activeIdx + 1) % items.length;
-            else activeIdx = (activeIdx - 1 + items.length) % items.length;
+            if (activeIdx < 0) {
+                activeIdx = e.key === 'ArrowDown' ? 0 : items.length - 1;
+            } else if (e.key === 'ArrowDown') {
+                activeIdx = (activeIdx + 1) % items.length;
+            } else {
+                activeIdx = (activeIdx - 1 + items.length) % items.length;
+            }
 
             items.forEach((item, idx) => item.classList.toggle('active', idx === activeIdx));
         }
@@ -206,7 +213,7 @@ const initSearch = () => {
             ).slice(0, 8); // 最多显示 8 个结果
 
             if (matches.length > 0) {
-                resultsList.innerHTML = matches.map((m, idx) => {
+                resultsList.innerHTML = matches.map((m) => {
                     let iconUrl = m.icon;
                     // 如果没有配置图标，基于原站域名动态计算出最优初始网络 Favicon 路径
                     if (!iconUrl && m.url && m.url.startsWith('http')) {
@@ -235,7 +242,7 @@ const initSearch = () => {
                         : (m.icon || '🔗');
 
                     return `
-                        <div class="local-result-item ${idx === 0 ? 'active' : ''}" onclick="recordClick('${m.id}'); window.open('${m.url}', '${window.appData.settings?.link_target || '_blank'}')">
+                        <div class="local-result-item" onclick="recordClick('${m.id}'); window.open('${m.url}', '${window.appData.settings?.link_target || '_blank'}')">
                             <span class="result-icon">${iconTag}</span>
                             <div class="result-info">
                                 <div class="result-title">${m.title}</div>
