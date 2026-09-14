@@ -10,7 +10,10 @@ if (!fs.existsSync(KV_DIR)) fs.mkdirSync(KV_DIR, { recursive: true });
 
 export const DB_PATH = process.env.DB_PATH || path.join(ROOT_DIR, 'local_d1.db');
 export const PORT = process.env.PORT || 3000;
-export const JWT_SECRET = process.env.JWT_SECRET || 'cloudnav-secret-2026';
+if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required and must not be empty');
+}
+export const JWT_SECRET = process.env.JWT_SECRET;
 export const CRON_SECRET = process.env.CRON_SECRET || 'cloudnav-cron-secret-secure-key';
 export const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 export const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '';
