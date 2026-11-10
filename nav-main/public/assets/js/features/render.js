@@ -315,6 +315,7 @@ const renderNav = () => {
             navItem.className = `sidebar-nav-item ${window.activeCatId === cat.id ? 'active' : ''} ${cat.hidden ? 'is-hidden-cat' : ''}`;
             navItem.dataset.id = cat.id; // 增加 ID 绑定
             navItem.tabIndex = 0; // 启用键盘焦点
+            navItem.title = cat.name || '';
 
             if (window.isPageManagementMode && cat.id !== 'VIRTUAL_FREQ') {
                 navItem.classList.add('sortable-cat'); // 标记可排序
@@ -334,7 +335,8 @@ const renderNav = () => {
             const catIconHtml = cat.icon?.startsWith('http')
                 ? `<img src="${httpIconSrc(cat.icon)}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
                 : `<span style="font-size: 15px; line-height: 1; display: block;">${cat.icon || '📂'}</span>`;
-            let navHtml = `${dragHandleHtml}<span class="nav-icon" title="" style="width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; vertical-align: middle; margin-right: 8px;">${catIconHtml}</span><span class="nav-label">${cat.name}${countHtml}</span>`;
+            const safeCatName = escapeHTML(cat.name || '');
+            let navHtml = `${dragHandleHtml}<span class="nav-icon" title="" style="width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; vertical-align: middle; margin-right: 8px;">${catIconHtml}</span><span class="nav-label">${safeCatName}${countHtml}</span>`;
 
             // 增加管理快捷按钮
             if (window.isPageManagementMode && cat.id !== 'VIRTUAL_FREQ') {
@@ -416,18 +418,17 @@ const renderNav = () => {
                 ? `<img src="${httpIconSrc(cat.icon)}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
                 : `<span style="font-size: 20px; line-height: 1; display: block;">${cat.icon || '📂'}</span>`;
 
-            // 🔒 限制当前分类名展示：最多 1 个图标加 5 个字，溢出自动截断
-            const truncatedCatName = cat.name.length > 5 ? cat.name.substring(0, 5) + '...' : cat.name;
             const canEditCat = window.isPageManagementMode && cat.id !== 'VIRTUAL_FREQ';
+            const sectionTitle = canEditCat ? `${safeCatName}，点击编辑` : safeCatName;
 
             section.innerHTML = `
-                <div class="category-section-title ${canEditCat ? 'manage-clickable-cat' : ''}"
-                     style="display: flex; align-items: center; gap: 8px; ${canEditCat ? 'cursor: pointer; user-select: none;' : ''}"
-                     ${canEditCat ? `onclick="window.openCategoryEditModal('${cat.id}')" title="点击编辑分类名称及图标"` : ''}>
+                <h2 class="category-section-title ${canEditCat ? 'manage-clickable-cat' : ''}"
+                     ${canEditCat ? `style="cursor: pointer; user-select: none;" onclick="window.openCategoryEditModal('${cat.id}')"` : ''}
+                     title="${sectionTitle}">
                     <span style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; vertical-align: middle;">${sectionIconHtml}</span>
-                    <span class="cat-title-text">${escapeHTML(truncatedCatName)}</span>
-                    ${canEditCat ? `<i class="ri-edit-line edit-pencil-icon" style="font-size: 14px; opacity: 0.5; margin-left: 4px; transition: 0.2s;"></i>` : ''}
-                </div>
+                    <span class="cat-title-text">${safeCatName}</span>
+                    ${canEditCat ? `<i class="ri-edit-line edit-pencil-icon" style="font-size: 14px; opacity: 0.5; margin-left: 4px; transition: 0.2s;" aria-hidden="true"></i>` : ''}
+                </h2>
             `;
 
             const grid = document.createElement('div');

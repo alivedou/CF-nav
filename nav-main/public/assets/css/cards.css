@@ -51,25 +51,28 @@
     top: 0;
     z-index: 10;
     border-radius: 20px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    
-    /* 🔒 固定大小设计（配合 1图标+5个字限制，给卡片向上弹出释放充裕空间） */
-    max-width: 160px; /* 固定的最大宽度 */
-    height: 32px; /* 固定的高度 */
+    background: var(--chip-plate);
+    border: 1px solid var(--glass-border);
+    box-shadow: none;
+    margin-top: 0;
+    max-width: min(100%, 28rem);
+    min-height: 32px;
+    height: auto;
     box-sizing: border-box;
-    overflow: hidden; /* 强制裁剪溢出 */
+    overflow: visible;
 }
 
-/* 分类名文字样式（确保截断） */
+h2.category-section-title {
+    font-size: 14px;
+    line-height: 1.3;
+}
+
 .category-section-title .cat-title-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100px;
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    max-width: none;
 }
 
 .category-section-title .cat-icon {
@@ -196,8 +199,8 @@ body.light-theme .seg-btn {
 
 /* ==================== 卡片样式（Style 0 默认） ==================== */
 .card {
-    background: var(--glass);
-    border: none;
+    background: var(--card-plate);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
@@ -274,7 +277,7 @@ body:not(.view-style-2) .add-new-card {
 }
 
 .card:hover {
-    background: var(--glass-hover);
+    background: var(--card-plate-hover);
     transform: translateY(-2px);
     box-shadow: 0 0 15px rgba(57, 157, 255, 0.5), 0 0 30px rgba(57, 157, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
