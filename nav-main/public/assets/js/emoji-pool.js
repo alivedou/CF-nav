@@ -11,6 +11,7 @@
  * emoji-pool.js - Emoji 图标库与随机生成逻辑
  * ==========================================
  */
+import { displayIconUrl, iconifySvgUrl } from './iconify-url.js';
 const EMOJI_CATEGORIES = {
     natureAndTravel: ["🌍", "🌎", "🌏", "🌋", "🗻", "🏕️", "🏖️", "🏝️", "🏔️", "🌊", "🌲", "🌸", "🌞", "🌙", "⭐"],
     objectsAndSymbols: ["💡", "🔥", "✨", "🎈", "🎉", "💎", "🧭", "🎨", "📱", "💻", "🖥️", "电视", "📻", "📷", "🔋", "🔌", "💰", "💳", "❤️", "✅", "🌐", "🎵", "🎶", "🔗", "🔒", "🔑", "📦", "🎁"],
@@ -208,16 +209,25 @@ async function recommendEmojisAndSearchIconify(isRefreshEmojiOnly = false) {
         const data = await req.json();
         resBox.innerHTML = '';
         if (data.icons && data.icons.length > 0) {
+            const lightTheme = document.body?.classList.contains('light-theme');
+            const chip = lightTheme ? '#f4f7fb' : 'rgba(255,255,255,0.08)';
+            const chipHover = lightTheme ? '#e7edf5' : 'rgba(255,255,255,0.2)';
             data.icons.forEach(iconName => {
-                const imgUrl = `https://api.iconify.design/${iconName}.svg`;
+                const storedUrl = iconifySvgUrl(iconName);
+                if (!storedUrl) return;
                 const img = document.createElement('img');
-                img.src = imgUrl;
-                img.style.cssText = 'width:30px; height:30px; cursor:pointer; background:rgba(255,255,255,0.06); border-radius:6px; padding:4px; transition: 0.2s; border:1px solid rgba(255,255,255,0.1);';
-                img.onmouseover = () => img.style.background = 'rgba(255,255,255,0.2)';
-                img.onmouseout = () => img.style.background = 'rgba(255,255,255,0.06)';
-                img.onclick = () => selectIcon(imgUrl);
+                img.src = displayIconUrl(storedUrl);
+                img.alt = iconName;
+                img.style.cssText = `width:30px; height:30px; cursor:pointer; background:${chip}; border-radius:6px; padding:4px; transition: 0.2s; border:1px solid rgba(255,255,255,0.1); object-fit:contain;`;
+                img.onmouseover = () => { img.style.background = chipHover; };
+                img.onmouseout = () => { img.style.background = chip; };
+                img.onclick = () => selectIcon(storedUrl);
+                img.onerror = () => img.remove();
                 resBox.appendChild(img);
             });
+            if (!resBox.querySelector('img')) {
+                resBox.innerHTML = '<span style="font-size:12px; color:#aaa;">未找到结果</span>';
+            }
         } else {
             resBox.innerHTML = '<span style="font-size:12px; color:#aaa;">未找到结果</span>';
         }

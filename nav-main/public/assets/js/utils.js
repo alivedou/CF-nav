@@ -61,10 +61,14 @@ const getRandomEmoji = () => FALLBACK_EMOJIS[Math.floor(Math.random() * FALLBACK
  * @param {HTMLImageElement} img - 触发错误的图片元素
  * @param {string} originalUrl - 原始链接 (用于提取域名)
  */
+const isIconifyImage = (img) => (img?.getAttribute?.('src') || '').includes('api.iconify.design');
+
 const handleIconError = (img, originalUrl) => {
     // 防止死循环：如果已经是 span 了就不处理
     if (!img || img.tagName !== 'IMG') return;
     if (img.getAttribute('data-healing') === 'done') return;
+    // Iconify 矢量图不是站点 favicon，自愈链会把它换成别的站标
+    if (isIconifyImage(img)) return;
 
     // 移除 HTML 上的 inline onload 和 onerror，防止干扰后续程序赋值的 onload/onerror 行为
     img.removeAttribute('onload');
@@ -181,6 +185,7 @@ const handleIconError = (img, originalUrl) => {
 const handleIconLoad = (img, originalUrl) => {
     if (!img || img.tagName !== 'IMG') return;
     if (img.getAttribute('data-healing') === 'done') return;
+    if (isIconifyImage(img)) return;
 
     // 当图片加载成功，由于 1x1 是透明点，如果 naturalWidth <= 1 则认定为 Service Worker 的 404 拦截代理
     if (img.naturalWidth && img.naturalWidth <= 1) {

@@ -1,3 +1,5 @@
+import { canonicalIconifyUrl, displayIconUrl } from './iconify-url.js';
+
 const showToast = (...args) => window.showToast(...args);
 const closeAllModals = (...args) => window.closeAllModals(...args);
 const updateStyles = (...args) => window.updateStyles(...args);
@@ -76,7 +78,9 @@ const openCategoryEditModal = (catId) => {
     title.innerText = isEdit ? "编辑分类" : "添加新分类";
 
     const safeTitle = utils.escapeHTML(cat.name || '');
-    const safeIcon = utils.escapeHTML(cat.icon || '📂');
+    const iconValue = canonicalIconifyUrl(cat.icon || '📂');
+    const safeIcon = utils.escapeHTML(iconValue);
+    const previewSrc = utils.escapeHTML(displayIconUrl(iconValue));
 
     body.innerHTML = `
         <div class="form-row">
@@ -88,7 +92,7 @@ const openCategoryEditModal = (catId) => {
             <div style="display:flex; gap:8px; width:100%; align-items:center;">
                 <input type="text" id="edit-icon" value="${safeIcon}" placeholder="Emoji 或 图片 URL">
                 <div id="edit-icon-preview" class="preview-container">
-                    ${cat.icon?.startsWith('http') ? `<img src="${cat.icon}">` : `<span>${cat.icon || '📂'}</span>`}
+                    ${iconValue.startsWith('http') ? `<img src="${previewSrc}" alt="">` : `<span>${safeIcon || '📂'}</span>`}
                 </div>
             </div>
         </div>
@@ -125,7 +129,8 @@ const openCategoryEditModal = (catId) => {
     document.getElementById('edit-icon').oninput = (e) => {
         const val = e.target.value.trim();
         const preview = document.getElementById('edit-icon-preview');
-        preview.innerHTML = val.startsWith('http') ? `<img src="${val}">` : `<span>${val || '📂'}</span>`;
+        const src = displayIconUrl(val);
+        preview.innerHTML = src.startsWith('http') ? `<img src="${utils.escapeHTML(src)}" alt="">` : `<span>${utils.escapeHTML(val) || '📂'}</span>`;
     };
 
     // 绑定智能 Emoji 推荐与 Iconify 联合搜索
@@ -155,7 +160,7 @@ const openCategoryEditModal = (catId) => {
 
     confirmBtn.onclick = async () => {
         const newName = document.getElementById('edit-cat-name').value.trim();
-        const newIcon = document.getElementById('edit-icon').value.trim();
+        const newIcon = canonicalIconifyUrl(document.getElementById('edit-icon').value.trim());
 
         if (!newName) return showToast("名称不能为空", "#e67e22");
 
@@ -243,7 +248,9 @@ const openEditModal = (id) => {
     document.getElementById('edit-title').innerText = id ? '编辑书签' : '添加新书签';
 
     const safeTitle = utils.escapeHTML(item.title);
-    const safeIcon = utils.escapeHTML(item.icon);
+    const iconValue = canonicalIconifyUrl(item.icon || '');
+    const safeIcon = utils.escapeHTML(iconValue);
+    const previewSrc = utils.escapeHTML(displayIconUrl(iconValue));
 
     body.innerHTML = `
         <div class="form-row">
@@ -264,7 +271,7 @@ const openEditModal = (id) => {
             <div style="display:flex; gap:8px; width:100%; align-items:center;">
                 <input type="text" id="edit-icon" value="${safeIcon || ''}" placeholder="Emoji 或 图片 URL">
                 <div id="edit-icon-preview" class="preview-container">
-                    ${item.icon?.startsWith('http') ? `<img src="${item.icon}">` : `<span>${item.icon || '🔗'}</span>`}
+                    ${iconValue.startsWith('http') ? `<img src="${previewSrc}" alt="">` : `<span>${safeIcon || '🔗'}</span>`}
                 </div>
             </div>
         </div>
@@ -348,7 +355,8 @@ const openEditModal = (id) => {
     document.getElementById('edit-icon').oninput = (e) => {
         const val = e.target.value.trim();
         const preview = document.getElementById('edit-icon-preview');
-        preview.innerHTML = val.startsWith('http') ? `<img src="${val}">` : `<span>${val || '🔗'}</span>`;
+        const src = displayIconUrl(val);
+        preview.innerHTML = src.startsWith('http') ? `<img src="${utils.escapeHTML(src)}" alt="">` : `<span>${utils.escapeHTML(val) || '🔗'}</span>`;
     };
 
     // 监听 URL 输入启动多源测速与备份加载
@@ -499,7 +507,7 @@ const saveItem = async () => {
         id: id || 'item_' + Date.now(),
         url: document.getElementById('edit-url').value.trim(),
         title: document.getElementById('edit-title-input').value.trim(),
-        icon: document.getElementById('edit-icon').value.trim(),
+        icon: canonicalIconifyUrl(document.getElementById('edit-icon').value.trim()),
         desc: document.getElementById('edit-desc').value.trim(),
         catId: catId,
         cat_id: catId, // 双重保险：兼容后端不同版本的字段名

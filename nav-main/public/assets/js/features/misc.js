@@ -2,6 +2,7 @@
  * @fileoverview Feature module: misc
  * Split from the former app.js God-file. Window bridge kept for inline onclick.
  */
+import { canonicalIconifyUrl, displayIconUrl } from '../iconify-url.js';
 const initThemeMode = (...args) => window.initThemeMode(...args);
 const manualSyncCloud = (...args) => window.manualSyncCloud(...args);
 const escapeHTML = (...args) => (window.utils && window.utils.escapeHTML ? window.utils.escapeHTML(...args) : String(args[0] ?? ''));
@@ -192,18 +193,20 @@ window.selectEmoji = (emoji) => {
     // 兼容分类图标和网址图标编辑框 (增加 edit-icon 支持)
     const iconInput = document.getElementById('edit-cat-icon') || document.getElementById('edit-icon');
     if (iconInput) {
-        iconInput.value = emoji;
+        const stored = emoji.startsWith('http') ? canonicalIconifyUrl(emoji) : emoji;
+        iconInput.value = stored;
         // 如果存在预览框，同步更新预览
         const previewBox = document.getElementById('cat-icon-preview');
-        if (previewBox) previewBox.innerText = emoji;
+        if (previewBox) previewBox.innerText = stored;
 
         // 针对书签图标编辑框，显式同步更新其预览框结构 (支持 Emoji 和网络 Favicon)
         const editIconPreview = document.getElementById('edit-icon-preview');
         if (editIconPreview) {
-            if (emoji.startsWith('http')) {
-                editIconPreview.innerHTML = `<img src="${emoji}" style="width:100%; height:100%; border-radius:4px;" onload="utils.handleIconLoad(this, '${emoji}')" onerror="utils.handleIconError(this, '${emoji}')">`;
+            if (stored.startsWith('http')) {
+                const src = escapeHTML(displayIconUrl(stored));
+                editIconPreview.innerHTML = `<img src="${src}" alt="" style="width:100%; height:100%; border-radius:4px; object-fit:contain;">`;
             } else {
-                editIconPreview.innerHTML = `<span>${emoji}</span>`;
+                editIconPreview.innerHTML = `<span>${escapeHTML(stored)}</span>`;
             }
         }
 

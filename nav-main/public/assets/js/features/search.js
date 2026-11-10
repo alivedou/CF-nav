@@ -2,6 +2,7 @@
  * @fileoverview Feature module: search
  * Split from the former app.js God-file. Window bridge kept for inline onclick.
  */
+import { displayIconUrl } from '../iconify-url.js';
 const initThemeMode = (...args) => window.initThemeMode(...args);
 const manualSyncCloud = (...args) => window.manualSyncCloud(...args);
 const escapeHTML = (...args) => (window.utils && window.utils.escapeHTML ? window.utils.escapeHTML(...args) : String(args[0] ?? ''));
@@ -238,7 +239,7 @@ const initSearch = () => {
                         } catch(e) {}
                     }
                     const iconTag = iconUrl?.startsWith('http')
-                        ? `<img src="${iconUrl}" data-retry-index="0" data-title="${escapeHTML(m.title)}" onload="utils.handleIconLoad(this, '${m.url}')" onerror="utils.handleIconError(this, '${m.url}')">`
+                        ? `<img src="${escapeHTML(displayIconUrl(iconUrl))}" data-retry-index="0" data-title="${escapeHTML(m.title)}" onload="utils.handleIconLoad(this, '${m.url}')" onerror="utils.handleIconError(this, '${m.url}')">`
                         : (m.icon || '🔗');
 
                     return `

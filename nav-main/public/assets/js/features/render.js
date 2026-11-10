@@ -2,9 +2,11 @@
  * @fileoverview Feature module: render
  * Split from the former app.js God-file. Window bridge kept for inline onclick.
  */
+import { displayIconUrl } from '../iconify-url.js';
 const initThemeMode = (...args) => window.initThemeMode(...args);
 const manualSyncCloud = (...args) => window.manualSyncCloud(...args);
 const escapeHTML = (...args) => (window.utils && window.utils.escapeHTML ? window.utils.escapeHTML(...args) : String(args[0] ?? ''));
+const httpIconSrc = (url) => escapeHTML(displayIconUrl(url));
 const showToast = (...args) => window.showToast(...args);
 const showLoader = (...args) => window.showLoader(...args);
 const hideLoader = (...args) => window.hideLoader(...args);
@@ -96,7 +98,7 @@ const buildCardHtml = (i) => {
     }
 
     const icon = iconUrl && iconUrl.startsWith('http')
-        ? `<img src="${iconUrl}" loading="lazy" data-retry-index="0" data-title="${escapeHTML(i.title)}" onload="utils.handleIconLoad(this, '${i.url}')" onerror="utils.handleIconError(this, '${i.url}')">`
+        ? `<img src="${httpIconSrc(iconUrl)}" loading="lazy" data-retry-index="0" data-title="${escapeHTML(i.title)}" onload="utils.handleIconLoad(this, '${i.url}')" onerror="utils.handleIconError(this, '${i.url}')">`
         : `<span class="emoji-icon">${i.icon || '🔗'}</span>`;
     return `<a href="${i.url}" target="${target}" ${rel}><div class="icon-wrapper">${icon}</div><h3>${i.title}</h3></a>`;
 };
@@ -257,8 +259,8 @@ const renderNav = () => {
                     icon.className = 'zen-freq-item';
                     icon.style.animationDelay = `${idx * 0.05}s`; // T8: Stagger
                     icon.innerHTML = item.icon?.startsWith('http')
-                        ? `<img src="${item.icon}" title="${item.title}">`
-                        : `<span class="emoji-icon" title="${item.title}">${item.icon || '🔗'}</span>`;
+                        ? `<img src="${httpIconSrc(item.icon)}" title="${escapeHTML(item.title)}">`
+                        : `<span class="emoji-icon" title="${escapeHTML(item.title)}">${item.icon || '🔗'}</span>`;
                     icon.onclick = () => {
                         recordClick(item.id);
                         const target = window.appData.settings?.link_target || '_blank';
@@ -274,7 +276,7 @@ const renderNav = () => {
                 menuItem.tabIndex = 0; // 启用键盘焦点
                 menuItem.style.animationDelay = `${(idx * 0.05) + 0.2}s`; // T8: Stagger
                 const catIconHtml = cat.icon?.startsWith('http')
-                    ? `<img src="${cat.icon}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
+                    ? `<img src="${httpIconSrc(cat.icon)}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
                     : `<span style="font-size: 16px; line-height: 1; display: block;">${cat.icon || '📂'}</span>`;
                 menuItem.innerHTML = `<span class="menu-icon" style="width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; vertical-align: middle; margin-right: 6px;">${catIconHtml}</span><span class="menu-label">${cat.name}</span>`;
 
@@ -330,7 +332,7 @@ const renderNav = () => {
                 : '';
 
             const catIconHtml = cat.icon?.startsWith('http')
-                ? `<img src="${cat.icon}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
+                ? `<img src="${httpIconSrc(cat.icon)}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
                 : `<span style="font-size: 15px; line-height: 1; display: block;">${cat.icon || '📂'}</span>`;
             let navHtml = `${dragHandleHtml}<span class="nav-icon" title="" style="width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; vertical-align: middle; margin-right: 8px;">${catIconHtml}</span><span class="nav-label">${cat.name}${countHtml}</span>`;
 
@@ -411,7 +413,7 @@ const renderNav = () => {
             section.className = 'category-section';
             section.id = 'section-' + cat.id;
             const sectionIconHtml = cat.icon?.startsWith('http')
-                ? `<img src="${cat.icon}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
+                ? `<img src="${httpIconSrc(cat.icon)}" class="cat-icon-img" style="width: 100%; height: 100%; object-fit: contain;">`
                 : `<span style="font-size: 20px; line-height: 1; display: block;">${cat.icon || '📂'}</span>`;
 
             // 🔒 限制当前分类名展示：最多 1 个图标加 5 个字，溢出自动截断
