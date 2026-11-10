@@ -491,9 +491,8 @@ body.light-theme .user-name {
     color: var(--text);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     
-    /* 默认平时闲置退缩贴边半遮挡（向右退 25px，保留 20px 在屏幕边缘可碰） */
-    opacity: 0.45;
-    transform: translateX(25px);
+    opacity: 1;
+    transform: none;
 }
 
 /* 激活弹出态（正在滚动、侧边栏开启、或处于搜索激活状态时，完全弹出来） */
@@ -557,8 +556,8 @@ body.zen-active:not(.zen-silent) .summon-search-btn {
     }
     .summon-search-btn {
         right: 15px;
-        bottom: calc(140px + env(safe-area-inset-bottom, 0px)); /* 中下部黄金单手触控区 */
-        transform: translateX(35px); /* 一半隐藏在右侧 (15px间距 + 20px半宽度) */
+        bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+        transform: none;
     }
 }
 

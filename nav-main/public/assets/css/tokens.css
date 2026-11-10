@@ -17,7 +17,11 @@
     --glass-bg: rgba(0, 0, 0, 0.2);
     --glass: var(--glass-bg);
     --glass-hover: rgba(0, 0, 0, 0.35);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    /* 书签和分类名压在壁纸上时用实色底板，保证正文对比 */
+    --card-plate: rgba(16, 18, 22, 0.88);
+    --card-plate-hover: rgba(22, 26, 32, 0.94);
+    --chip-plate: rgba(16, 18, 22, 0.9);
 
     /* 文字颜色 */
     --text: #ffffff;
@@ -50,7 +54,10 @@ body.light-theme {
     --glass-bg: rgba(255, 255, 255, 0.45);
     --glass: var(--glass-bg);
     --glass-hover: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-border: rgba(15, 23, 42, 0.16);
+    --card-plate: rgba(255, 255, 255, 0.94);
+    --card-plate-hover: rgba(255, 255, 255, 0.98);
+    --chip-plate: rgba(255, 255, 255, 0.96);
     --text: #2c3e50;
     --text-dim: rgba(44, 62, 80, 0.7);
     --bg-overlay-opacity: 0.25;
@@ -95,11 +102,11 @@ body.light-theme .tab-btn.active {
 }
 
 body.light-theme .card {
-    background: var(--glass);
+    background: var(--card-plate);
 }
 
 body.light-theme .card:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--card-plate-hover);
     box-shadow: 0 0 12px rgba(57, 157, 255, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -152,11 +159,11 @@ body.light-theme .sidebar-footer {
 
 body.light-theme .category-section-title {
     color: #2c3e50;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    background: var(--chip-plate);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--glass-border);
+    box-shadow: none;
 }
 
 body.light-theme .sidebar-toggle,
