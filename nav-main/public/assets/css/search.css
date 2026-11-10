@@ -535,13 +535,46 @@ body.light-theme #sea-input::placeholder {
     color: var(--text-dim);
     cursor: pointer;
     font-size: 20px;
-    padding: 2px;
+    padding: 4px;
+    min-width: 24px;
+    min-height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.6;
+    opacity: 0.85;
     transition: opacity 0.2s;
     border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.home-search-launch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(100%, 62rem);
+    margin: 0 auto 18px;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+    background: var(--card-plate);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 15px;
+    text-align: left;
+}
+
+.home-search-launch span {
+    flex: 1;
+}
+
+.home-search-launch kbd {
+    flex-shrink: 0;
+}
+
+body.zen-active .home-search-launch,
+body.search-active .home-search-launch {
+    display: none;
 }
 
 .sea-clear-btn:hover {

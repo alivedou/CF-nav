@@ -2,6 +2,7 @@
  * @fileoverview Feature module: search
  * Split from the former app.js God-file. Window bridge kept for inline onclick.
  */
+import { displayIconUrl } from '../iconify-url.js';
 const initThemeMode = (...args) => window.initThemeMode(...args);
 const manualSyncCloud = (...args) => window.manualSyncCloud(...args);
 const escapeHTML = (...args) => (window.utils && window.utils.escapeHTML ? window.utils.escapeHTML(...args) : String(args[0] ?? ''));
@@ -238,7 +239,7 @@ const initSearch = () => {
                         } catch(e) {}
                     }
                     const iconTag = iconUrl?.startsWith('http')
-                        ? `<img src="${iconUrl}" data-retry-index="0" data-title="${escapeHTML(m.title)}" onload="utils.handleIconLoad(this, '${m.url}')" onerror="utils.handleIconError(this, '${m.url}')">`
+                        ? `<img src="${escapeHTML(displayIconUrl(iconUrl))}" data-retry-index="0" data-title="${escapeHTML(m.title)}" onload="utils.handleIconLoad(this, '${m.url}')" onerror="utils.handleIconError(this, '${m.url}')">`
                         : (m.icon || '🔗');
 
                     return `
@@ -271,29 +272,29 @@ const initSearch = () => {
     });
 
     // 召唤按钮点击逻辑
-    const summonBtn = document.getElementById('btn-summon-search');
-    if (summonBtn) {
-        const handleSummon = (e) => {
-            e.stopPropagation(); // 🚀 阻止冒泡，防止被下方的全局 document.click 误当作外部点击瞬间秒关！
-            document.body.classList.add('search-active');
-
-            // 移动端/多端双重聚焦与唤起键盘优化
-            sea.focus();
-            setTimeout(() => {
-                sea.focus();
-                // 确保光标移到最末尾
-                const val = sea.value;
-                sea.value = '';
-                sea.value = val;
-            }, 50);
-        };
-
+    const focusSea = () => {
+        sea.focus({ preventScroll: true });
+        const val = sea.value;
+        sea.value = '';
+        sea.value = val;
+    };
+    const handleSummon = (e) => {
+        e.stopPropagation(); // 阻止冒泡，防止被下方的全局 document.click 误当作外部点击瞬间秒关
+        document.body.classList.add('search-active');
+        // 首页按钮会在 search-active 下被隐藏，浏览器会把焦点退回 body。下一帧再抢回来。
+        focusSea();
+        requestAnimationFrame(() => {
+            focusSea();
+            setTimeout(focusSea, 80);
+        });
+    };
+    document.querySelectorAll('[data-summon-search]').forEach((summonBtn) => {
         summonBtn.onclick = handleSummon;
         summonBtn.ontouchend = (e) => {
-            e.preventDefault(); // 阻止默认点击，避免穿透与重复触发
+            e.preventDefault();
             handleSummon(e);
         };
-    }
+    });
 
     // 初始化清空搜索按钮
     const clearBtn = document.getElementById('sea-clear-btn');

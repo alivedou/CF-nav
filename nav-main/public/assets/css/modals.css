@@ -296,10 +296,27 @@ body.light-theme .preview-container {
     margin-top: auto; /* Task 21.1: 关键！将页脚推至容器底部 */
     padding: 50px 0 20px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 11px;
+    color: var(--text);
+    font-size: 12px;
     z-index: 50;
     transition: all 0.3s ease;
+}
+
+.copyright-text {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--chip-plate);
+    border: 1px solid var(--glass-border);
+}
+
+.copyright-license {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+    color: inherit;
 }
 
 /* Task 21.2: 管理模式下强制隐藏页脚，避免干扰编辑交互 */
@@ -308,7 +325,7 @@ body.admin-mode .footer-info {
 }
 
 body.light-theme .footer-info {
-    color: rgba(0, 0, 0, 0.3);
+    color: #2c3e50;
 }
 
 .copyright-text a:hover {

@@ -3,6 +3,7 @@
  * 主题模式模块 (Theme Mode Module)
  * 负责侧边栏明亮模式、暗黑模式与系统跟随的切换及状态保存。
  */
+import { displayIconUrl } from './iconify-url.js';
 
 // 使用 Object.defineProperty 代理，确保所有对全局变量 themeMode 的读写在任何模块都完全透传
 Object.defineProperty(window, 'themeMode', {
@@ -28,6 +29,11 @@ window.applyThemeUpdate = () => {
     if (meta) {
         meta.content = isDark ? '#111111' : '#f0f3f8';
     }
+
+    document.querySelectorAll('img[src*="api.iconify.design"]').forEach((img) => {
+        const next = displayIconUrl(img.getAttribute('src') || '');
+        if (next && img.getAttribute('src') !== next) img.setAttribute('src', next);
+    });
 };
 
 // 监听系统主题变化 (全局监听一次即可)
